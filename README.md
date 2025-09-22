@@ -42,14 +42,3 @@ El algoritmo Selection Sort tiene complejidad de O(n²) en el mejor, promedio y 
 El algoritmo std::sort tiene una complejidad promedio y en el peor caso de O(n log n), lo que lo hace mucho más eficiente para listas más grandes. Al apoyarse en introsort, ayuda a que en el peor escenario se mantenga un rendimiento decente.  
 
 De esta forma, Selection Sort me sirve como referencia didáctica y para validar los procesos de ordenamiento iniciales, mientras que std::sort representa la opción para manejar el inventario completo de manera fácil. 
-
-
-## SICT0303: Implementa acciones científicas
-
-### Implementa mecanismos para consultar información de las estructuras correctos y útiles dentro de un programa
-
-
-### Implementa mecanismos de lectura de archivos correctos y útiles dentro de un programa
-
-
-### Implementa mecanismos de escritura de archivos correctos y útiles dentro de un programa
