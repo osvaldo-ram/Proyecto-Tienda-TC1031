@@ -27,47 +27,119 @@ El sistema puede ordenar los productos por **nombre, precio, stock y fecha de ca
 
 ### Hace un análisis de complejidad correcto y completo para los algoritmos de ordenamiento usados en el programa
 
-El algoritmo Selection Sort tiene complejidad de O(n²) en el mejor, promedio y peor caso. Esto significa que el tiempo de ejecución crece de forma cuadrática conforme aumenta el número de productos en el inventario, por lo que únicamente resulta práctico para volúmenes pequeños de datos como los que manejo en este avance.  
+Para los algoritmos de ordenamiento, usé:
 
-El algoritmo std::sort tiene una complejidad promedio y en el peor caso de O(n log n), lo que lo hace mucho más eficiente para listas más grandes. Al apoyarse en introsort, ayuda a que en el peor escenario se mantenga un rendimiento decente.  
+Quick Sort para ordenar por nombre. Este algoritmo tiene una complejidad promedio de O(n log n). Entonces, cuando aumenta el número de productos, el tiempo de ejecución crece de manera proporcional al logaritmo del tamaño. En el peor caso puede ser O(n²), pero para datos como nombres de productos que suelen estar desordenados, me parece que funciona bien.
+
+Merge Sort para ordenar por precio. Este algoritmo garantiza O(n log n) en todos los casos, desde el peor hasta en el mejor escenario. Por lo que mantiene un buen rendimiento sin importar cómo estén distribuidos los precios inicialmente.
+
+std::sort para stock y caducidad. Para estos criterios usé el algoritmos de la biblioteca estándar que también tiene complejidad O(n log n), y como ya está optimizado y probado me pareció buena opción.
 
 ### Hace un análisis de complejidad correcto y completo todas las estructuras de datos y cada uno de sus usos en el programa
 
-Para el almacenamiento principal de productos, seleccioné std::vector porque ofrece acceso aleatorio en O(1) y es compatible con los algoritmos de ordenamiento de la STL, aunque su búsqueda es O(n).
+std::vector para productos. usé vector como estructura principal porque permite acceso rápido a cualquier elemento en O(1) y es compatible con los algoritmos de ordenamiento. La desventaja es que buscar un elemento específico requiere O(n).
 
-Para optimizar las consultas frecuentes, implementé std::map para el indexado por categoría y rangos de precio, para operaciones de búsqueda en O(log n). También usé std::set para almacenar categorías únicas, garantizando que las operaciones de inserción y consulta sean O(log n).
+std::map para índices. Implementé mapas para organizar productos por categoría y por rangos de precio. Esto permiete encontrar productos de una categoría específica en O(log n) en lugar de tener que buscar en todas la lista.
 
-En cuanto a los algoritmos, mantuve Selection Sort para ordenar por nombre con complejidad O(n²). Para los criterios como precio, stock y caducidad, utilicé std::sort con complejidad O(n log n).
+std::set para categorías. Usé un set para almacenar las categorías únicas, lo que garatiza que no haya duplicados y permite consultar la lista de categorías de manera eficiente.
+
+###Hace un análisis de complejidad correcto y completo para todos los demás componentes del programa y determina la complejidad final del programa
+
+####Operaciones Crear, Leer, Actualizar y Eliminar.
+
+Agregar producto. Es muy rápido para añadir el productos a la lista (O(1)), pero después necesita reorganizar todos los índices para mantener las búsquedas rápidas (O(n log n)).
+
+Buscar por SKU. Tiene que revisar producto por producto hasta encontrar el que coincide con el SKU buscado (O(n)). Entre más productos haya más tiempo tomará.
+
+Actualizar producto. Primero busca el producto (O(n)) y luego reorganiza los índices (O(n log n)).
+
+Eliminar producto. Es similar al de actualizar, busca el producto (O(n)) y reorganiza índices (O(n log n)).
+
+####Consultar y búsquedas
+
+Mostrar por categoría. Encuentra la categoría al instante (O(log n)) y solo muestra los productos de esa categoría.
+
+Busqueda por precio. Revisa todos los productos uno por uno para encontrar los que están en el rango de precio (O(n)).
+
+Mostrar categorías. Solo accede a la lista de categorías ya preparada (O(1)).
+
+####Manejo de archivos
+
+Cargar desde csv. Lee el archivo línea por línea (O(n)) y luego organiza todo para que las búsquedas sean rápidas (O(n log n)).
+
+Guardar en csv. Escribe todos los productos al archivo (O(n)).
+
+###Complejidad final del programa
+
+El programa funciona muy buen para inventario de tamaño normal tipo cientos o miles de productos. Las partes más lentas son cuando se agregan, actualizan o eliminan productos porque necesita reorganizar todo, pero esto es necesario para mantener las búsquedas por categoriía rápidas.
+
+Las operaciones rápidas son: Mostrar categorías, búsqueda por categoría.
+Las operaciones moderadas son: Agregar/actualizar/eliminar productos.
+Las operaciones más lentas son: Buscar por SKU, búsquedas por precio.
+
+Para el uso normla de una tienda, el rendimiento del programa creo que es más que sufienciente y las operaciones que se usan más frecuentemente como mostrar productos por categoria son las más eficientes.
 
 ## SICT0302: Toma decisiones
 
 ### Selecciona un algoritmo de ordenamiento adecuado al problema y lo usa correctamente
 
-Para este avance decidí implementar dos enfoques. Para ordenar por nombre utilicé Selection Sort, ya que es un algoritmo sencillo de programar y me permite validar que las comparaciones funcionan correctamente. Aunque no es el más eficiente, me sirve como punto de partida para demostrar el ordenamiento dentro del inventario.  
+Para los diferentes tipos de ordenamiento en el inventario, elegí algoritmos específicos según el tipo de datos.
 
-Para los casos de precio, stock y caducidad empleé std::sort de la STL, que utiliza introsort. Esto permite tener un algoritmo mucho más eficiente y práctico cuando se trabaja con listas más grandes, ya que garantiza un rendimiento promedio y en el peor caso de O(n log n).  
+Para ordenar por nombre usé Quick Sort porque los nombres de productos son texto y este algoritmo es muy eficiente con datos que no tienen un patrón específico. Quick Sort funciona bien en la práctica aunque en teoría puede tener un peor caso lento.
 
-De esta manera, mi sistema integra tanto un algoritmo implementado por Selection Sort como un algoritmo optimizado de biblioteca std::sort, lo que me permite justificar el uso de cada uno según la situación.  
+Para ordenar por precio implementé Merge Sort porque los precios son números y este algoritmo garantiza un rendimiento consistente sin importar cómo estén organizados inicialmente los precios.
+
+Para stock y caducidad utilicé el algoritmo std::sort porque ya está probado y optimizado, lo que me ahorra tiempo y evita posibles errores.
+
+Esta combinación me permite tener un balance entre eficiencia y confiabilidad, al usar algoritmos más especializados donde se necesitan y aprovechando lo que ya viene incluido en C++ para ahorrar esfuerzo.
 
 ## Selecciona una estructura de datos adecuada al problema y lo usa correctamente
 
-Seleccioné std::vector como estructura principal para el acceso rápido a los elementos y para la compatibilidad con los algoritmos de ordenamiento. Para las consultas específicas, implementé std::map, permite acceder rápidamente a productos por categoría en O(log n) en lugar de tener que hacer búsquedas lineales O(n).
+Para almacenar los productos elegí std::vector como estructura principal porque es más eficiente, permite un acceso rápido a cualquier posición, es compatible con todos los algoritmos de ordenamiento, es fácil de usar y de mantener.
 
-El  std::set para las categorías únicas fue una decisión consciente, ya que me asegura que no habrá duplicados y me permite listar todas las categorías disponibles. Estas estructuras las reconstruyo después de cada ordenamiento para mantener la consistencia entre los datos y los índices.
+Para hacer las búsquedas más rápidas creé índices adicionales con:
+std::map para organizar productos por categoría y precio.
+std::set para guardar la lista de categorías sin duplicados
+
+Estás estructuras permite encontrar productos de una categoría, mostrar categorías y operaciones rápidamente.
+
+Y así puedo tener un almacenamiento principal simple y eficiente, con índices que aceleran las búsquedas más frecuentes sin complicar demasiado el código.
+
 
 ## SICT0303: Implementa acciones científicas
 
 ### Implementa mecanismos para consultar información de las estructuras correctos
 
-Implementé tres mecanismos principales de consulta que aprovechan las estructuras de datos. La función mostrarProductosPorCategoria() utiliza el mapa de categorías para recuperar productos específicos en tiempo O(log n), mucho más eficiente que una búsqueda lineal.
+Implementé varios sitemas de consulta que aprovechan las estructuras de datos para obtener información de buena manera:
 
-La función buscarProductosPorRangoPrecio() realiza un filtrado sobre el vector principal pero con notificación inmediata de resultados, y mostrarCategorias() utiliza el set para listar todas las categorías disponibles sin duplicados.
+Búsqueda por categoría. Utilizo un mapa que relaciona cada categoría con sus productos correspondientes. Cuando el usuario busca una categoría, el sistema accede directamente a esa categoría y muestra solo los productos que perteneces a ella, sin tener que revisar todo el inventario.
+
+Búsqueda por SKU. Implementé una función que recorre la lista de productos hasta encontrar el que coincide con el SKU buscando. Aunque revisa producto por producto, para el tamaño de inventario que se maneja funciona de una manera aceptable.
+
+Búsqueda por rango de precios. Esta función filtra todos los productos y muestra solo aquellos cuyo precio está dentro del rango especificado. Es una búsqueda completa pero efectiva para encontrar productos en un precio específico.
+
+Listado de categorías. Muestro todas las categorías disponibles usando un conjunto que automáticamente elimina duplicados, así se asegura que cada categoría aparezca solo una vez.
+
 
 ## Implementa mecanismos de lectura de archivos para cargar datos a las estructuras de manera correcta
 
-La función cargarDesdeCSV() implementa un proceso robusto que incluye validación de archivo, parsing de cada línea con manejo de excepciones, y la construcción automática de las estructuras de datos auxiliares. Además, después de cargar los datos principales, llamo a construirEstructuras() para inicializar los mapas y sets que optimizan las consultas.
+El programa carga el inventario desde un .csv de la siguiente manera:
 
-También implementé guardarEnCSV() que permite exportar el estado actual del inventario manteniendo el formato original, con precios de 2 decimales y fechas en formato ISO.
+Proceso de carga. Se lee el archivo línea por línea, ignorando la primera línea que contiene los encabezados. Para cada línea, se separan los campos por comas y se convierten los textos a números donde es necesario como en precio y cantidad.
 
+Manejor de errores. Si se encuentra un linea con formacto incorrecto o datos no válidos, se muestra un mensaje de error pero el programa continúa procesando el resto del archivo sin detenerse.
 
-De esta forma, Selection Sort me sirve como referencia didáctica y para validar los procesos de ordenamiento iniciales, mientras que std::sort representa la opción para manejar el inventario completo de manera fácil.
+Construcción de estructuras. Después de cargar todos los productos, se construyen automáticamente los mapas y conjuntos que hacen posibles las búsquedas rápidas por categoría y precio.
+
+##Implementa mecanismos de escritura de archivos para guardar los datos de las estructuras de manera correcta
+
+Implementé la capacidad al programa de guardar el inventario actualizado.
+
+Formato. Al guardar el nuevo inventario, mantengo exactamente el mismo formato del archivo original, con los mismos encabezados y orden de campos.
+
+Formato de los datos. Los precios se guardan siempre con dos decimales y las fechas en el formato estándar, así el archivo puede ser leído por otros programas.
+
+Guardado completo. El programa escribe todos los productos actuales incluyendo cualquier cambio, adición o eliminación que se haya hecho en su funcionamiento, así se conservan los cambios realizados.
+
+Estos mecanismos de entrada y salida hacen que el programa sea confiable y fácil de usar, y permite cargar datos existentes y guardar cambios de forma segura.
+
