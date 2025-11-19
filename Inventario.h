@@ -13,29 +13,166 @@
 #include <cmath>  
 #include <math.h> 
 
+//clase para los productos en el inventario
 class Producto {
 public:
-    std::string sku;
-    std::string nombre;
-    std::string categoria;
-    double precio;      
-    int cantidad;       
-    std::string fechaCaducidad;
+    std::string sku;            //Identificador unico del producto
+    std::string nombre;         //Nombre del producto
+    std::string categoria;      //Categoria del producto
+    double precio;              //Precio del producto
+    int cantidad;               //Cantidad en el inventario
+    std::string fechaCaducidad; //Fecha de caducidad YYYY-MM-DD
 
-    Producto(std::string _sku, std::string _nombre, std::string _categoria,
-             double _precio, int _cantidad, std::string _fechaCaducidad)
+    //Constructor para un producto con todos sus atributos
+    Producto(std::string _sku = "", std::string _nombre = "", std::string _categoria = "",
+             double _precio = 0.0, int _cantidad = 0, std::string _fechaCaducidad = "")
         : sku(_sku), nombre(_nombre), categoria(_categoria),
           precio(_precio), cantidad(_cantidad), fechaCaducidad(_fechaCaducidad) {} 
 };
 
+//Clase principal para gestionar el inventario
 class Inventario {
 private:
-    std::vector<Producto> productos;
-    std::map<std::string, std::vector<Producto*>> productosPorCategoria;
-    std::map<double, std::vector<Producto*>> productosPorPrecio;
-    std::set<std::string> categoriasUnicas;
+    std::vector<Producto> productos; //Almacenamiento de todos los productos
+    std::map<std::string, std::vector<Producto*>> productosPorCategoria; //Indice para buscar por categoria
+    std::map<double, std::vector<Producto*>> productosPorPrecio; //Indice para buscar por rango de precio
+    std::set<std::string> categoriasUnicas; //Conjunto de todas las categorias
+
+    //Algoritmo QuickSort para ordenar los productos por su nombre
+    void quickSortPorNombre(int left, int right) {
+        if (left < right) {
+            int pivotIndex = partitionPorNombre(left, right);
+            quickSortPorNombre(left, pivotIndex - 1);
+            quickSortPorNombre(pivotIndex + 1, right);
+        }
+    }
+
+    //Funcion auxiliar para particionar en QuickSort
+    int partitionPorNombre(int left, int right) {
+        std::string pivot = productos[right].nombre;
+        int i = left - 1;
+
+        for (int j = left; j < right; j++) {
+            if (productos[j].nombre <= pivot) {
+                i++;
+                std::swap(productos[i], productos[j]);
+            }
+        }
+        std::swap(productos[i + 1], productos[right]);
+        return i + 1;
+    }
+
+    //Algoritmo MergeSort para ordenar los productos por su precio
+    void mergeSortPorPrecio(int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            mergeSortPorPrecio(left, mid);
+            mergeSortPorPrecio(mid + 1, right);
+            mergePorPrecio(left, mid, right);
+        }
+    }
+
+    //Funcion auxiliar para mezclar en MergeSort
+    void mergePorPrecio(int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+
+        //Arrays temporales
+        std::vector<Producto> leftArr(n1);
+        std::vector<Producto> rightArr(n2);
+
+        for (int i = 0; i < n1; i++)
+            leftArr[i] = productos[left + i];
+        for (int j = 0; j < n2; j++)
+            rightArr[j] = productos[mid + 1 + j];
+
+        int i = 0, j = 0, k = left;
+
+        //Mezclar los arrays temporales al array principal
+        while (i < n1 && j < n2) {
+            if (leftArr[i].precio <= rightArr[j].precio) {
+                productos[k] = leftArr[i];
+                i++;
+            } else {
+                productos[k] = rightArr[j];
+                j++;
+            }
+            k++;
+        }
+
+        //Copiar los elementos restantes
+        while (i < n1) {
+            productos[k] = leftArr[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2) {
+            productos[k] = rightArr[j];
+            j++;
+            k++;
+        }
+    }
 
 public:
+
+    //Agrega un nuevo producto al inventario
+    bool agregarProducto(const Producto& nuevoProducto) {
+        //Verifica que el SKU no este duplicado
+        for (const auto& producto : productos) {
+            if (producto.sku == nuevoProducto.sku) {
+                std::cout << "Error: El SKU " << nuevoProducto.sku << " ya existe" << std::endl;
+                return false;
+            }
+        }
+        
+        productos.push_back(nuevoProducto);
+        construirEstructuras(); //Actualizar indices
+        std::cout << "Producto agregado exitosamente" << std::endl;
+        return true;
+    }
+
+    //Busca un producto por su SKU 
+    Producto* buscarProductoPorSKU(const std::string& sku) {
+        for (auto& producto : productos) {
+            if (producto.sku == sku) {
+                return &producto;
+            }
+        }
+        return nullptr; //Devuelve nullptr si no se encuentra el producto
+    }
+
+    //Actualiza la informacion de un producto que ya existe
+    bool actualizarProducto(const std::string& sku, const Producto& productoActualizado) {
+        for (auto& producto : productos) {
+            if (producto.sku == sku) {
+                producto = productoActualizado;
+                construirEstructuras(); //Reconstruye el indice despues de actualizar
+                std::cout << "Producto actualizado exitosamente" << std::endl;
+                return true;
+            }
+        }
+        std::cout << "Error: Producto con SKU " << sku << " no encontrado" << std::endl;
+        return false;
+    }
+
+    //Elimina un producto del inventario
+    bool eliminarProducto(const std::string& sku) {
+        auto it = std::remove_if(productos.begin(), productos.end(),
+                               [&](const Producto& p) { return p.sku == sku; });
+        
+        if (it != productos.end()) {
+            productos.erase(it, productos.end());
+            construirEstructuras(); //Actualiza el indice despues de eliminar
+            std::cout << "Producto eliminado exitosamente" << std::endl;
+            return true;
+        }
+        
+        std::cout << "Error: Producto con SKU " << sku << " no encontrado" << std::endl;
+        return false;
+    }
+
+    //Carga los productos desde el .csv
     bool cargarDesdeCSV(const std::string& archivo) {
         std::ifstream file(archivo);
         if (!file.is_open()) {
@@ -44,11 +181,12 @@ public:
         }
 
         std::string linea;
-        // Saltar encabezado
+        //Salta la linea de encabezado
         if (!std::getline(file, linea)) return false;
 
         std::vector<Producto> tmp;
 
+        //Lee cada linea del archivo
         while (std::getline(file, linea)) {
             if (linea.empty()) continue;
 
@@ -75,34 +213,42 @@ public:
         }
 
         if (tmp.empty()) {
-            std::cout << "No se pudieron cargar productos del archivo." << std::endl;
+            std::cout << "No se pudieron cargar productos del archivo" << std::endl;
             return false;
         }
 
         productos = std::move(tmp);
-        construirEstructuras();
-        std::cout << "Se cargaron " << productos.size() << " productos correctamente." << std::endl;
+        construirEstructuras(); //Construye indices despues de cargar
+        std::cout << "Se cargaron " << productos.size() << " productos correctamente" << std::endl;
         return true;
     }
 
+    //Construye las estructuras de indice para busquedas
     void construirEstructuras() {
         productosPorCategoria.clear();
         productosPorPrecio.clear();
         categoriasUnicas.clear();
 
         for (auto& producto : productos) {
-            // Estructura por categoría
+            //Indexa por categoria
             productosPorCategoria[producto.categoria].push_back(&producto);
             
+            //Indexa por rangos de precio redondeado a decenas
             double precioRedondeado = round(producto.precio / 10.0) * 10.0;
             productosPorPrecio[precioRedondeado].push_back(&producto);
             
-            // Conjunto de categorías únicas
+            //Almacena categorias unicas
             categoriasUnicas.insert(producto.categoria);
         }
     }
 
+    //Muestra todos los productos
     void mostrarProductos() {
+        if (productos.empty()) {
+            std::cout << "No hay productos en el inventario" << std::endl;
+            return;
+        }
+
         std::cout << std::fixed << std::setprecision(2);
         std::cout << std::left << std::setw(8)  << "SKU"
                   << std::setw(25) << "Nombre"
@@ -123,6 +269,7 @@ public:
         }
     }
 
+    //Muestra productos filtrados por su categoria
     void mostrarProductosPorCategoria(const std::string& categoria) {
         auto it = productosPorCategoria.find(categoria);
         if (it == productosPorCategoria.end()) {
@@ -145,6 +292,7 @@ public:
         }
     }
 
+    //Muestra todas las categorias
     void mostrarCategorias() {
         std::cout << "\nCategorias disponibles:" << std::endl;
         for (const auto& categoria : categoriasUnicas) {
@@ -152,7 +300,22 @@ public:
         }
     }
 
+    //Busca productos por su rango de precio
     void buscarProductosPorRangoPrecio(double min, double max) {
+        std::vector<Producto*> resultados;
+        
+        //Filtra productos por su rango de precio
+        for (const auto& producto : productos) {
+            if (producto.precio >= min && producto.precio <= max) {
+                resultados.push_back(const_cast<Producto*>(&producto));
+            }
+        }
+
+        if (resultados.empty()) {
+            std::cout << "No se encontraron productos en el rango de precio $" << min << " - $" << max << std::endl;
+            return;
+        }
+
         std::cout << "\nProductos en rango de precio $" << min << " - $" << max << ":" << std::endl;
         std::cout << std::left << std::setw(8)  << "SKU"
                   << std::setw(25) << "Nombre"
@@ -160,37 +323,26 @@ public:
                   << std::setw(8)  << "Precio" << std::endl;
         std::cout << std::string(60, '-') << std::endl;
 
-        for (const auto& producto : productos) {
-            if (producto.precio >= min && producto.precio <= max) {
-                std::cout << std::left << std::setw(8)  << producto.sku
-                          << std::setw(25) << producto.nombre
-                          << std::setw(15) << producto.categoria
-                          << std::setw(8)  << producto.precio << std::endl;
-            }
+        for (const auto& producto : resultados) {
+            std::cout << std::left << std::setw(8)  << producto->sku
+                      << std::setw(25) << producto->nombre
+                      << std::setw(15) << producto->categoria
+                      << std::setw(8)  << producto->precio << std::endl;
         }
     }
 
-    // Algoritmos de ordenamiento
+    //Metodos de ordenamiento
+
     void ordenarPorNombre() {
-        const size_t n = productos.size();
-        for (size_t i = 0; i + 1 < n; ++i) {
-            size_t minIdx = i;
-            for (size_t j = i + 1; j < n; ++j) {
-                if (productos[j].nombre < productos[minIdx].nombre) {
-                    minIdx = j;
-                }
-            }
-            if (minIdx != i) std::swap(productos[i], productos[minIdx]);
-        }
-        construirEstructuras();
+        if (productos.empty()) return;
+        quickSortPorNombre(0, productos.size() - 1);
+        std::cout << "Productos ordenados por nombre" << std::endl;
     }
 
     void ordenarPorPrecio() {
-        std::sort(productos.begin(), productos.end(),
-                  [](const Producto& a, const Producto& b) {
-                      return a.precio < b.precio;
-                  });
-        construirEstructuras();
+        if (productos.empty()) return;
+        mergeSortPorPrecio(0, productos.size() - 1);
+        std::cout << "Productos ordenados por precio" << std::endl;
     }
 
     void ordenarPorStock() {
@@ -198,7 +350,7 @@ public:
                   [](const Producto& a, const Producto& b) {
                       return a.cantidad < b.cantidad;
                   });
-        construirEstructuras();
+        std::cout << "Productos ordenados por stock" << std::endl;
     }
 
     void ordenarPorCaducidad() {
@@ -206,9 +358,10 @@ public:
                   [](const Producto& a, const Producto& b) {
                       return a.fechaCaducidad < b.fechaCaducidad;
                   });
-        construirEstructuras();
+        std::cout << "Productos ordenados por fecha de caducidad" << std::endl;
     }
 
+    //Guarda el inventario actual 
     bool guardarEnCSV(const std::string& archivo) {
         std::ofstream file(archivo);
         if (!file.is_open()) {
@@ -216,10 +369,10 @@ public:
             return false;
         }
 
-        // Escribir encabezado
+        //Escribe el encabezado
         file << "sku,nombre,categoria,precio,stock,caducidad\n";
         
-        // Escribir productos
+        //Escribe cada producto
         for (const auto& p : productos) {
             file << p.sku << ","
                  << p.nombre << ","
@@ -230,8 +383,13 @@ public:
         }
 
         file.close();
-        std::cout << "Inventario guardado en " << archivo << " correctamente." << std::endl;
+        std::cout << "Inventario guardado en " << archivo << " correctamente" << std::endl;
         return true;
+    }
+
+    //Devuelve el numero total de los productos en el inventario
+    size_t obtenerNumeroProductos() const {
+        return productos.size();
     }
 };
 
