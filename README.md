@@ -23,23 +23,6 @@ El sistema puede ordenar los productos por **nombre, precio, stock y fecha de ca
   
 - Detectar cuáles están por vencer. 
 
-## SICT0302: Toma decisiones
-
-### Selecciona un algoritmo de ordenamiento adecuado al problema y lo usa correctamente
-
-Para este avance decidí implementar dos enfoques. Para ordenar por nombre utilicé Selection Sort, ya que es un algoritmo sencillo de programar y me permite validar que las comparaciones funcionan correctamente. Aunque no es el más eficiente, me sirve como punto de partida para demostrar el ordenamiento dentro del inventario.  
-
-Para los casos de precio, stock y caducidad empleé std::sort de la STL, que utiliza introsort. Esto permite tener un algoritmo mucho más eficiente y práctico cuando se trabaja con listas más grandes, ya que garantiza un rendimiento promedio y en el peor caso de O(n log n).  
-
-De esta manera, mi sistema integra tanto un algoritmo implementado por Selection Sort como un algoritmo optimizado de biblioteca std::sort, lo que me permite justificar el uso de cada uno según la situación.  
-
-## Selecciona una estructura de datos adecuada al problema y lo usa correctamente
-
-Seleccioné std::vector como estructura principal para el acceso rápido a los elementos y para la compatibilidad con los algoritmos de ordenamiento. Para las consultas específicas, implementé std::map, permite acceder rápidamente a productos por categoría en O(log n) en lugar de tener que hacer búsquedas lineales O(n).
-
-El  std::set para las categorías únicas fue una decisión consciente, ya que me asegura que no habrá duplicados y me permite listar todas las categorías disponibles. Estas estructuras las reconstruyo después de cada ordenamiento para mantener la consistencia entre los datos y los índices.
-
-
 ## SICT0301: Evalúa los componentes
 
 ### Hace un análisis de complejidad correcto y completo para los algoritmos de ordenamiento usados en el programa
@@ -56,6 +39,22 @@ Para optimizar las consultas frecuentes, implementé std::map para el indexado p
 
 En cuanto a los algoritmos, mantuve Selection Sort para ordenar por nombre con complejidad O(n²). Para los criterios como precio, stock y caducidad, utilicé std::sort con complejidad O(n log n).
 
+## SICT0302: Toma decisiones
+
+### Selecciona un algoritmo de ordenamiento adecuado al problema y lo usa correctamente
+
+Para este avance decidí implementar dos enfoques. Para ordenar por nombre utilicé Selection Sort, ya que es un algoritmo sencillo de programar y me permite validar que las comparaciones funcionan correctamente. Aunque no es el más eficiente, me sirve como punto de partida para demostrar el ordenamiento dentro del inventario.  
+
+Para los casos de precio, stock y caducidad empleé std::sort de la STL, que utiliza introsort. Esto permite tener un algoritmo mucho más eficiente y práctico cuando se trabaja con listas más grandes, ya que garantiza un rendimiento promedio y en el peor caso de O(n log n).  
+
+De esta manera, mi sistema integra tanto un algoritmo implementado por Selection Sort como un algoritmo optimizado de biblioteca std::sort, lo que me permite justificar el uso de cada uno según la situación.  
+
+## Selecciona una estructura de datos adecuada al problema y lo usa correctamente
+
+Seleccioné std::vector como estructura principal para el acceso rápido a los elementos y para la compatibilidad con los algoritmos de ordenamiento. Para las consultas específicas, implementé std::map, permite acceder rápidamente a productos por categoría en O(log n) en lugar de tener que hacer búsquedas lineales O(n).
+
+El  std::set para las categorías únicas fue una decisión consciente, ya que me asegura que no habrá duplicados y me permite listar todas las categorías disponibles. Estas estructuras las reconstruyo después de cada ordenamiento para mantener la consistencia entre los datos y los índices.
+
 ## SICT0303: Implementa acciones científicas
 
 ### Implementa mecanismos para consultar información de las estructuras correctos
@@ -71,4 +70,4 @@ La función cargarDesdeCSV() implementa un proceso robusto que incluye validaci�
 También implementé guardarEnCSV() que permite exportar el estado actual del inventario manteniendo el formato original, con precios de 2 decimales y fechas en formato ISO.
 
 
-De esta forma, Selection Sort me sirve como referencia didáctica y para validar los procesos de ordenamiento iniciales, mientras que std::sort representa la opción para manejar el inventario completo de manera fácil. 
+De esta forma, Selection Sort me sirve como referencia didáctica y para validar los procesos de ordenamiento iniciales, mientras que std::sort representa la opción para manejar el inventario completo de manera fácil.
