@@ -43,9 +43,9 @@ std::map para índices. Implementé mapas para organizar productos por categorí
 
 std::set para categorías. Usé un set para almacenar las categorías únicas, lo que garatiza que no haya duplicados y permite consultar la lista de categorías de manera eficiente.
 
-###Hace un análisis de complejidad correcto y completo para todos los demás componentes del programa y determina la complejidad final del programa
+### Hace un análisis de complejidad correcto y completo para todos los demás componentes del programa y determina la complejidad final del programa
 
-####Operaciones Crear, Leer, Actualizar y Eliminar.
+#### Operaciones Crear, Leer, Actualizar y Eliminar.
 
 Agregar producto. Es muy rápido para añadir el productos a la lista (O(1)), pero después necesita reorganizar todos los índices para mantener las búsquedas rápidas (O(n log n)).
 
@@ -55,7 +55,7 @@ Actualizar producto. Primero busca el producto (O(n)) y luego reorganiza los ín
 
 Eliminar producto. Es similar al de actualizar, busca el producto (O(n)) y reorganiza índices (O(n log n)).
 
-####Consultar y búsquedas
+#### Consultar y búsquedas
 
 Mostrar por categoría. Encuentra la categoría al instante (O(log n)) y solo muestra los productos de esa categoría.
 
@@ -63,13 +63,13 @@ Busqueda por precio. Revisa todos los productos uno por uno para encontrar los q
 
 Mostrar categorías. Solo accede a la lista de categorías ya preparada (O(1)).
 
-####Manejo de archivos
+#### Manejo de archivos
 
 Cargar desde csv. Lee el archivo línea por línea (O(n)) y luego organiza todo para que las búsquedas sean rápidas (O(n log n)).
 
 Guardar en csv. Escribe todos los productos al archivo (O(n)).
 
-###Complejidad final del programa
+### Complejidad final del programa
 
 El programa funciona muy buen para inventario de tamaño normal tipo cientos o miles de productos. Las partes más lentas son cuando se agregan, actualizan o eliminan productos porque necesita reorganizar todo, pero esto es necesario para mantener las búsquedas por categoriía rápidas.
 
