@@ -131,7 +131,7 @@ Manejor de errores. Si se encuentra un linea con formacto incorrecto o datos no 
 
 Construcción de estructuras. Después de cargar todos los productos, se construyen automáticamente los mapas y conjuntos que hacen posibles las búsquedas rápidas por categoría y precio.
 
-##Implementa mecanismos de escritura de archivos para guardar los datos de las estructuras de manera correcta
+## Implementa mecanismos de escritura de archivos para guardar los datos de las estructuras de manera correcta
 
 Implementé la capacidad al programa de guardar el inventario actualizado.
 
