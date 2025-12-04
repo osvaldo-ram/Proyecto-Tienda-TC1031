@@ -145,7 +145,7 @@ int main() {
                 break;
             }
             case 13:
-                inventario.guardarEnCSV("inventario_actualizado.csv");
+                inventario.guardarEnCSV("inventario.csv"); 
                 break;
             case 14:
                 std::cout << "Saliendo del sistema..." << std::endl;
