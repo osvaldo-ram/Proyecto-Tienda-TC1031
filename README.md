@@ -37,17 +37,17 @@ std::sort para stock y caducidad. Para estos criterios usé el algoritmos de la 
 
 ### Hace un análisis de complejidad correcto y completo todas las estructuras de datos y cada uno de sus usos en el programa
 
-std::vector para productos. usé vector como estructura principal porque permite acceso rápido a cualquier elemento en O(1) y es compatible con los algoritmos de ordenamiento. La desventaja es que buscar un elemento específico requiere O(n).
+std::vector para productos. Usé vector como estructura principal porque permite acceso rápido a cualquier elemento en O(1) y es compatible con los algoritmos de ordenamiento. La desventaja es que buscar un elemento específico requiere O(n).
 
-std::map para índices. Implementé mapas para organizar productos por categoría y por rangos de precio. Esto permiete encontrar productos de una categoría específica en O(log n) en lugar de tener que buscar en todas la lista.
+std::map para índices. Implementé mapas para organizar productos por categoría y por rangos de precio. Para categorías, localizar la clave de la categoría en el mapa toma O(log C), donde C es el número de categorías distintas, y luego se recorre solo la lista de productos de esa categoría (O(k), donde k es la cantidad de productos en esa categoría).
 
-std::set para categorías. Usé un set para almacenar las categorías únicas, lo que garatiza que no haya duplicados y permite consultar la lista de categorías de manera eficiente.
+std::set para categorías. Usé un set para almacenar las categorías únicas. Insertar una categoría es O(log C) y recorrer todas las categorías para mostrarlas es O(C), garantizando que no haya duplicados.
 
 ### Hace un análisis de complejidad correcto y completo para todos los demás componentes del programa y determina la complejidad final del programa
 
 #### Operaciones Crear, Leer, Actualizar y Eliminar.
 
-Agregar producto. Es muy rápido para añadir el productos a la lista (O(1)), pero después necesita reorganizar todos los índices para mantener las búsquedas rápidas (O(n log n)).
+Agregar producto. Primero revisa que el SKU no esté repetido recorriendo la lista completa de productos (O(n)). Después añade el producto al final del vector (O(1) amortizado) y reconstruye los índices (mapas y set) para mantener las búsquedas rápidas (O(n log n)). En conjunto, la operación de agregar es O(n log n).
 
 Buscar por SKU. Tiene que revisar producto por producto hasta encontrar el que coincide con el SKU buscado (O(n)). Entre más productos haya más tiempo tomará.
 
@@ -57,27 +57,28 @@ Eliminar producto. Es similar al de actualizar, busca el producto (O(n)) y reorg
 
 #### Consultar y búsquedas
 
-Mostrar por categoría. Encuentra la categoría al instante (O(log n)) y solo muestra los productos de esa categoría.
+Mostrar por categoría. Utiliza un mapa que relaciona cada categoría con sus productos. Buscar la categoría en el mapa toma O(log C) (C = número de categorías) y luego se recorren solo los productos de esa categoría (O(k)), por lo que la complejidad total es O(log C + k).
 
-Busqueda por precio. Revisa todos los productos uno por uno para encontrar los que están en el rango de precio (O(n)).
+Búsqueda por precio. Actualmente recorre todos los productos uno por uno y filtra los que caen en el rango de precio indicado, con complejidad O(n). Aunque existe un índice por precio, todavía no se usa directamente en esta consulta, lo que deja abierta una posible optimización futura.
 
-Mostrar categorías. Solo accede a la lista de categorías ya preparada (O(1)).
+Mostrar categorías. Recorre el std::set de categorías únicas para imprimirlas, lo que toma O(C), donde C es el número de categorías distintas.
+
 
 #### Manejo de archivos
 
-Cargar desde csv. Lee el archivo línea por línea (O(n)) y luego organiza todo para que las búsquedas sean rápidas (O(n log n)).
+Cargar desde csv. Lee el archivo inventario.csv línea por línea (O(n)), convierte los datos de texto a los tipos correspondientes y al final reconstruye los índices (mapas y set) para que las búsquedas sean rápidas (O(n log n)). La complejidad total de la carga es O(n log n).
 
-Guardar en csv. Escribe todos los productos al archivo (O(n)).
+Guardar en csv. Recorre todos los productos en memoria y los escribe de nuevo en el mismo archivo inventario.csv, manteniendo el formato original. Esta operación es O(n).
 
 ### Complejidad final del programa
 
-El programa funciona muy buen para inventario de tamaño normal tipo cientos o miles de productos. Las partes más lentas son cuando se agregan, actualizan o eliminan productos porque necesita reorganizar todo, pero esto es necesario para mantener las búsquedas por categoriía rápidas.
+El programa funciona muy bien para inventario de tamaño normal tipo cientos o miles de productos. Las partes más lentas son cuando se agregan, actualizan o eliminan productos porque, además de recorrer la lista, se reconstruyen los índices (mapas y set), lo que lleva a una complejidad O(n log n). Esto es necesario para mantener las búsquedas por categoría rápidas.
 
 Las operaciones rápidas son: Mostrar categorías, búsqueda por categoría.
 Las operaciones moderadas son: Agregar/actualizar/eliminar productos.
 Las operaciones más lentas son: Buscar por SKU, búsquedas por precio.
 
-Para el uso normla de una tienda, el rendimiento del programa creo que es más que sufienciente y las operaciones que se usan más frecuentemente como mostrar productos por categoria son las más eficientes.
+Para el uso normal de una tienda, el rendimiento del programa creo que es más que suficiente y las operaciones que se usan más frecuentemente como mostrar productos por categoría son las más eficientes.
 
 ## SICT0302: Toma decisiones
 
@@ -101,7 +102,7 @@ Para hacer las búsquedas más rápidas creé índices adicionales con:
 std::map para organizar productos por categoría y precio.
 std::set para guardar la lista de categorías sin duplicados
 
-Estás estructuras permite encontrar productos de una categoría, mostrar categorías y operaciones rápidamente.
+Estas estructuras permiten encontrar productos de una categoría, mostrar categorías y operaciones rápidamente.
 
 Y así puedo tener un almacenamiento principal simple y eficiente, con índices que aceleran las búsquedas más frecuentes sin complicar demasiado el código.
 
@@ -110,11 +111,11 @@ Y así puedo tener un almacenamiento principal simple y eficiente, con índices 
 
 ### Implementa mecanismos para consultar información de las estructuras correctos
 
-Implementé varios sitemas de consulta que aprovechan las estructuras de datos para obtener información de buena manera:
+Implementé varios sistemas de consulta que aprovechan las estructuras de datos para obtener información de buena manera:
 
-Búsqueda por categoría. Utilizo un mapa que relaciona cada categoría con sus productos correspondientes. Cuando el usuario busca una categoría, el sistema accede directamente a esa categoría y muestra solo los productos que perteneces a ella, sin tener que revisar todo el inventario.
+Búsqueda por categoría. Utilizo un mapa que relaciona cada categoría con sus productos correspondientes. Cuando el usuario busca una categoría, el sistema accede directamente a esa categoría y muestra solo los productos que pertenecen a ella, sin tener que revisar todo el inventario.
 
-Búsqueda por SKU. Implementé una función que recorre la lista de productos hasta encontrar el que coincide con el SKU buscando. Aunque revisa producto por producto, para el tamaño de inventario que se maneja funciona de una manera aceptable.
+Búsqueda por SKU. Implementé una función que recorre la lista de productos hasta encontrar el que coincide con el SKU buscado. Aunque revisa producto por producto, para el tamaño de inventario que se maneja funciona de una manera aceptable.
 
 Búsqueda por rango de precios. Esta función filtra todos los productos y muestra solo aquellos cuyo precio está dentro del rango especificado. Es una búsqueda completa pero efectiva para encontrar productos en un precio específico.
 
@@ -127,7 +128,7 @@ El programa carga el inventario desde un .csv de la siguiente manera:
 
 Proceso de carga. Se lee el archivo línea por línea, ignorando la primera línea que contiene los encabezados. Para cada línea, se separan los campos por comas y se convierten los textos a números donde es necesario como en precio y cantidad.
 
-Manejor de errores. Si se encuentra un linea con formacto incorrecto o datos no válidos, se muestra un mensaje de error pero el programa continúa procesando el resto del archivo sin detenerse.
+Manejo de errores. Si se encuentra una línea con formato incorrecto o datos no válidos, se muestra un mensaje de error pero el programa continúa procesando el resto del archivo sin detenerse.
 
 Construcción de estructuras. Después de cargar todos los productos, se construyen automáticamente los mapas y conjuntos que hacen posibles las búsquedas rápidas por categoría y precio.
 
@@ -135,11 +136,14 @@ Construcción de estructuras. Después de cargar todos los productos, se constru
 
 Implementé la capacidad al programa de guardar el inventario actualizado.
 
-Formato. Al guardar el nuevo inventario, mantengo exactamente el mismo formato del archivo original, con los mismos encabezados y orden de campos.
+Formato. Al guardar el nuevo inventario, mantengo exactamente el mismo formato del archivo original, con los mismos encabezados y orden de campos, sobrescribiendo el archivo "inventario.csv".
 
-Formato de los datos. Los precios se guardan siempre con dos decimales y las fechas en el formato estándar, así el archivo puede ser leído por otros programas.
+Formato de los datos. Los precios se guardan con formato numérico y las fechas en el mismo formato que el archivo original, para que el CSV pueda ser leído por otros programas.
 
-Guardado completo. El programa escribe todos los productos actuales incluyendo cualquier cambio, adición o eliminación que se haya hecho en su funcionamiento, así se conservan los cambios realizados.
+Guardado completo. El programa escribe todos los productos actuales, incluyendo cualquier cambio, adición o eliminación que se haya hecho en la sesión. De esta manera, al volver a ejecutar el programa y cargar "inventario.csv", se conservan los cambios realizados.
 
 Estos mecanismos de entrada y salida hacen que el programa sea confiable y fácil de usar, y permite cargar datos existentes y guardar cambios de forma segura.
 
+## Aclaración del problema "archivo no salva producto"
+
+En la versión anterior, el programa guardaba los cambios en un archivo distinto llamado "inventario_actualizado.csv", pero al iniciar el programa siempre se leía desde "inventario.csv". Esto provocaba que, al cerrar y volver a abrir el programa, los productos recién agregados parecían que no se habían guardado. Para corregir este problema, ahora la opción de guardado escribe directamente sobre "inventario.csv", de modo que al reiniciar el programa los cambios sí se reflejan.
