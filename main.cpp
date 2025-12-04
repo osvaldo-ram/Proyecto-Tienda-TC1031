@@ -1,4 +1,4 @@
-#include "inventario.h"
+#include "Inventario.h"
 #include <iostream>
 #include <limits>
 
